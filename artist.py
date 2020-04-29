@@ -2,9 +2,10 @@
 # https://api.mongodb.com/python/current
 from pymongo import MongoClient
 
-
 client = MongoClient('mongodb+srv://mjneal2:Bre302th%26@playlistd-9nctl.mongodb.net/test?authSource=admin&replicaSet=Playlistd-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true')
-result = client['Playlistd']['Top100'].aggregate([
+
+res = client['Playlistd']['Top100'].aggregate(
+[
     {
         '$unwind': {
             'path': '$items'
@@ -17,5 +18,13 @@ result = client['Playlistd']['Top100'].aggregate([
         '$match': {
             'items.track.artists.name': 'Post Malone'
         }
+    }, {
+        '$project': {
+            'Track': '$items.track.name',
+            'Artist': '$items.track.artists.name'
+        }
     }
-])
+]
+)
+
+# Make 2 arrays for track name and artist

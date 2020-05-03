@@ -1,0 +1,44 @@
+##Selecting s_IDs from MongoDB
+import pymongo
+from pymongo import MongoClient
+
+#Incoming IDs from front end
+id_0 = 0
+id_1 = 1
+id_2 = 2
+
+#Connection to MongoDB server
+client = MongoClient('mongodb+srv://mjneal2:Bre302th%26@playlistd-9nctl.mongodb.net/test?authSource=admin&replicaSet=Playlistd-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true')
+db = client['Playlistd']
+likes = db.Likes
+
+# #Test connection
+# print(db.list_collection_names())
+
+s_id_list = likes.find(
+    {'$or': [
+        {'_id': id_0},
+        {'_id': id_1},
+        {'_id': id_2}
+            ]}
+)
+
+for doc in s_id_list:
+    print(doc)
+
+
+# s_id_list = db.Likes.aggregate(
+# [
+#     {
+#         '$unwind':
+#         {'path': '$liked_songs'}
+#     },
+#     {'$match':
+#         {'$or': [
+#             {'_id': 0},
+#             {'_id': 1},
+#             {'_id': 2}
+#             ]}
+#     }
+# ])
+# print(s_id_list)

@@ -1,0 +1,28 @@
+import sqlite3
+import pymongo
+from pymongo import MongoClient
+
+#Connection to SQL server
+connection = sqlite3.connect("Song.db")
+cursor = connection.cursor()
+
+#need input for s_id
+
+#Selecting song information from SQL
+sql_command = """
+    SELECT s.s_id as ID, s.s_name as Song_Title, f.artist_name as Artist_name, s.s_popularity as s_popularity
+    FROM Song s,
+      (SELECT a.artist_name as artist_name
+      FROM Artist a, Artist_perform ap
+      WHERE a.artist_ID = ap.artist_ID) f
+    LIMIT 10
+;"""
+cursor.execute(sql_command)
+data = cursor.fetchall()
+
+#Display the data
+print (data)
+
+#Save SQL changes
+connection.commit()
+connection.close()

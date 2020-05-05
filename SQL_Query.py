@@ -2,8 +2,17 @@ import sqlite3
 import pymongo
 from pymongo import MongoClient
 
-#Incoming Group ID from front end
+#Incoming data from front end
 g_id = 1
+
+LP1 = 0
+HP1 = 100
+
+LD1 = 0
+HD1 = 1
+
+LE1 = 0
+HE1 = 1
 
 #Connection to MongoDB server
 client = MongoClient('mongodb+srv://mjneal2:Bre302th%26@playlistd-9nctl.mongodb.net/test?authSource=admin&replicaSet=Playlistd-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true')
@@ -15,10 +24,7 @@ pg = db.Playlist_Groups
 
 #Extracting s_ID's from group and putting in SQL serviceable format
 doc = pg.find_one({'_id': g_id})
-songs = doc["song_ids"]
-# print(songs)
-placeholder= '?'
-placeholders= ', '.join(placeholder for unused in songs)
+songs_list = tuple(doc["song_ids"])
 
 #Connection to SQL server
 connection = sqlite3.connect("Song.db")
@@ -49,13 +55,32 @@ FROM
 
 WHERE s.s_id = f.s_id
 AND s.s_id = q.s_id
-AND s.s_id IN (%s)
+
+AND s.s_id IN {songs}
+
+AND s.s_popularity >= {LP}
+AND s.s_popularity <= {HP}
+
+AND s.s_danceability >= {LD}
+AND s.s_danceability <= {HD}
+
+AND s.s_energy >= {LE}
+AND s.s_energy <= {HE}
 
 ORDER BY s_id
 
 LIMIT 10
-;""" %placeholders
-cursor.execute(sql_command,songs)
+;"""
+# %placeholders
+cursor.execute(sql_command.format(
+    songs = songs_list,
+    LP = LP1,
+    HP = HP1,
+    LD = LD1,
+    HD = HD1,
+    LE = LE1,
+    HE = HE1
+))
 data = cursor.fetchall()
 
 #Display the data
